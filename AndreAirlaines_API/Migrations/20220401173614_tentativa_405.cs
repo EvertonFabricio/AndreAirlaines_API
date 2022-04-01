@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace AndreAirlaines_API.Migrations
 {
-    public partial class inicial : Migration
+    public partial class tentativa_405 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -29,7 +29,7 @@ namespace AndreAirlaines_API.Migrations
                     Logradouro = table.Column<string>(type: "varchar(150)", nullable: true),
                     Numero = table.Column<int>(type: "int", nullable: false),
                     Bairro = table.Column<string>(type: "varchar(50)", nullable: true),
-                    Cidade = table.Column<string>(type: "varchar(30)", nullable: true),
+                    Localidade = table.Column<string>(type: "varchar(30)", nullable: true),
                     Uf = table.Column<string>(type: "varchar(2)", nullable: true),
                     Pais = table.Column<string>(type: "varchar(20)", nullable: true),
                     Cep = table.Column<string>(type: "varchar(10)", nullable: true)

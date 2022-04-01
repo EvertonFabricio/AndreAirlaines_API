@@ -35,7 +35,9 @@ namespace AndreAirlaines_API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Passageiro>> GetPassageiro(string id)
         {
-           var passageiro = await _context.Passageiro.Include(e => e.Endereco).Where(d => d.Cpf == id).SingleOrDefaultAsync();
+           var passageiro = await _context.Passageiro.Include(e => e.Endereco)
+                                                     .Where(d => d.Cpf == id)
+                                                     .SingleOrDefaultAsync();
             
             //var passageiro = await _context.Passageiro.FindAsync(id);   //Linha original. É aqui que inclui a chamada do endereço.
             //no lugar do find async faz um lambda com .include
@@ -90,11 +92,21 @@ namespace AndreAirlaines_API.Controllers
             //****aqui é onde eu puxo o endereco que ja existe pra colocar no cliente que eu cadastrei.
            
             var endereco = await _context.Endereco.Where(x => x.Id == passageiro.Endereco.Id).FirstOrDefaultAsync();
+            var enderecoSite = await BuscaCep.BuscaCep.ViaCep(passageiro.Endereco.Cep);
+
 
             if (endereco != null)
             {
             passageiro.Endereco = endereco;
-            }  
+            }
+            else if (enderecoSite != null)
+            {
+                passageiro.Endereco.Logradouro = enderecoSite.Logradouro;
+                passageiro.Endereco.Localidade = enderecoSite.Localidade;
+                passageiro.Endereco.Uf = enderecoSite.Uf;
+                passageiro.Endereco.Bairro = enderecoSite.Bairro;
+            
+            }
              // daqui pra baixo ja tava feito.
             _context.Passageiro.Add(passageiro);
             try

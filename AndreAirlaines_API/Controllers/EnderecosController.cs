@@ -78,8 +78,6 @@ namespace AndreAirlaines_API.Controllers
         [HttpPost]
 
 
-
-
         public async Task<ActionResult<Endereco>> PostEndereco(Endereco endereco)
         {
             _context.Endereco.Add(endereco);

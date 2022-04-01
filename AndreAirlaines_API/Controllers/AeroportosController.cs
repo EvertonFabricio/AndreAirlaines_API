@@ -25,14 +25,16 @@ namespace AndreAirlaines_API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Aeroporto>>> GetAeroporto()
         {
-            return await _context.Aeroporto.ToListAsync();
+            return await _context.Aeroporto.Include(e => e.Endereco).ToListAsync();
         }
 
         // GET: api/Aeroportos/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Aeroporto>> GetAeroporto(string id)
         {
-            var aeroporto = await _context.Aeroporto.FindAsync(id);
+            var aeroporto = await _context.Aeroporto.Include(e => e.Endereco)
+                                                    .Where(d => d.Sigla == id)
+                                                    .SingleOrDefaultAsync();
 
             if (aeroporto == null)
             {
@@ -76,8 +78,40 @@ namespace AndreAirlaines_API.Controllers
         // POST: api/Aeroportos
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+
         public async Task<ActionResult<Aeroporto>> PostAeroporto(Aeroporto aeroporto)
         {
+            
+
+
+
+            //*********************
+
+
+
+            var endereco = await _context.Endereco.Where(x => x.Id == aeroporto.Endereco.Id).FirstOrDefaultAsync();
+            var enderecoSite = await BuscaCep.BuscaCep.ViaCep(aeroporto.Endereco.Cep);
+
+
+            if (endereco != null)
+            {
+                aeroporto.Endereco = endereco;
+            }
+            else if (enderecoSite != null)
+            {
+                aeroporto.Endereco.Logradouro = enderecoSite.Logradouro;
+                aeroporto.Endereco.Localidade = enderecoSite.Localidade;
+                aeroporto.Endereco.Uf = enderecoSite.Uf;
+                aeroporto.Endereco.Bairro = enderecoSite.Bairro;
+
+            }
+
+
+
+
+
+            //**********************
+
             _context.Aeroporto.Add(aeroporto);
             try
             {

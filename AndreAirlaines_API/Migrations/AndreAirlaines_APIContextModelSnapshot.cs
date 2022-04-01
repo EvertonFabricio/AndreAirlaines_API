@@ -74,9 +74,9 @@ namespace AndreAirlaines_API.Migrations
                         .HasColumnType("varchar(10)")
                         .HasColumnName("Cep");
 
-                    b.Property<string>("Cidade")
+                    b.Property<string>("Localidade")
                         .HasColumnType("varchar(30)")
-                        .HasColumnName("Cidade");
+                        .HasColumnName("Localidade");
 
                     b.Property<string>("Logradouro")
                         .HasColumnType("varchar(150)")

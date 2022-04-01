@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AndreAirlaines_API.Migrations
 {
     [DbContext(typeof(AndreAirlaines_APIContext))]
-    [Migration("20220401140119_inicial")]
-    partial class inicial
+    [Migration("20220401173614_tentativa_405")]
+    partial class tentativa_405
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -76,9 +76,9 @@ namespace AndreAirlaines_API.Migrations
                         .HasColumnType("varchar(10)")
                         .HasColumnName("Cep");
 
-                    b.Property<string>("Cidade")
+                    b.Property<string>("Localidade")
                         .HasColumnType("varchar(30)")
-                        .HasColumnName("Cidade");
+                        .HasColumnName("Localidade");
 
                     b.Property<string>("Logradouro")
                         .HasColumnType("varchar(150)")
