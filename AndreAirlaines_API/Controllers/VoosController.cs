@@ -25,14 +25,21 @@ namespace AndreAirlaines_API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Voo>>> GetVoo()
         {
-            return await _context.Voo.ToListAsync();
+            return await _context.Voo.Include(origem => origem.Origem)
+                                     .Include(destino => destino.Destino)
+                                     .Include(aeronave => aeronave.Aeronave)
+                                     .ToListAsync(); ;
         }
 
         // GET: api/Voos/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Voo>> GetVoo(int id)
         {
-            var voo = await _context.Voo.FindAsync(id);
+            var voo = await _context.Voo.Include(origem => origem.Origem)
+                                        .Include(destino => destino.Destino)
+                                        .Include(aeronave => aeronave.Aeronave)
+                                        .Where(a => a.Id == id)
+                                        .SingleOrDefaultAsync();
 
             if (voo == null)
             {
@@ -78,6 +85,18 @@ namespace AndreAirlaines_API.Controllers
         [HttpPost]
         public async Task<ActionResult<Voo>> PostVoo(Voo voo)
         {
+
+            var origem = await _context.Aeroporto.Where(x => x.Sigla == voo.Origem.Sigla).SingleOrDefaultAsync();
+            var destino = await _context.Aeroporto.Where(x => x.Sigla == voo.Destino.Sigla).SingleOrDefaultAsync();
+            var aeronave = await _context.Aeronave.Where(x => x.Id == voo.Aeronave.Id).SingleOrDefaultAsync();
+
+            if (origem != null && destino != null && aeronave != null)
+            {
+                voo.Origem = origem;
+                voo.Destino = destino;
+                voo.Aeronave = aeronave;
+            }
+
             _context.Voo.Add(voo);
             await _context.SaveChangesAsync();
 

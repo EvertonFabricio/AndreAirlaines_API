@@ -16,8 +16,6 @@ namespace AndreAirlaines_API.Model
         public DateTime HoraEmbarque { get; set; }
         [Required]
         public DateTime HoraDesembarque { get; set; }
-        [Required]
-        public Passageiro Passageiro { get; set; }
 
     }
 }

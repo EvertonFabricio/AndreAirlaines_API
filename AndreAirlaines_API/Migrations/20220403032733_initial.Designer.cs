@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AndreAirlaines_API.Migrations
 {
     [DbContext(typeof(AndreAirlaines_APIContext))]
-    [Migration("20220401173614_tentativa_405")]
-    partial class tentativa_405
+    [Migration("20220403032733_initial")]
+    partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -59,6 +59,23 @@ namespace AndreAirlaines_API.Migrations
                     b.HasIndex("EnderecoId");
 
                     b.ToTable("Aeroporto");
+                });
+
+            modelBuilder.Entity("AndreAirlaines_API.Model.Classe", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Descricao")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("Descricao");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Classe");
                 });
 
             modelBuilder.Entity("AndreAirlaines_API.Model.Endereco", b =>
@@ -134,6 +151,70 @@ namespace AndreAirlaines_API.Migrations
                     b.ToTable("Passageiro");
                 });
 
+            modelBuilder.Entity("AndreAirlaines_API.Model.Passagem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("ClasseId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DataCompra")
+                        .HasColumnType("datetime2");
+
+                    b.Property<double>("Desconto")
+                        .HasColumnType("float");
+
+                    b.Property<string>("PassageiroCpf")
+                        .HasColumnType("varchar(14)");
+
+                    b.Property<double>("Valor")
+                        .HasColumnType("float");
+
+                    b.Property<int?>("VooId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClasseId");
+
+                    b.HasIndex("PassageiroCpf");
+
+                    b.HasIndex("VooId");
+
+                    b.ToTable("Passagem");
+                });
+
+            modelBuilder.Entity("AndreAirlaines_API.Model.PrecoBase", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("DataInclusao")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DestinoSigla")
+                        .HasColumnType("varchar(5)");
+
+                    b.Property<string>("OrigemSigla")
+                        .HasColumnType("varchar(5)");
+
+                    b.Property<double>("Valor")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DestinoSigla");
+
+                    b.HasIndex("OrigemSigla");
+
+                    b.ToTable("PrecoBase");
+                });
+
             modelBuilder.Entity("AndreAirlaines_API.Model.Voo", b =>
                 {
                     b.Property<int>("Id")
@@ -156,9 +237,6 @@ namespace AndreAirlaines_API.Migrations
                     b.Property<string>("OrigemSigla")
                         .HasColumnType("varchar(5)");
 
-                    b.Property<string>("PassageiroCpf")
-                        .HasColumnType("varchar(14)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("AeronaveId");
@@ -166,8 +244,6 @@ namespace AndreAirlaines_API.Migrations
                     b.HasIndex("DestinoSigla");
 
                     b.HasIndex("OrigemSigla");
-
-                    b.HasIndex("PassageiroCpf");
 
                     b.ToTable("Voo");
                 });
@@ -190,6 +266,42 @@ namespace AndreAirlaines_API.Migrations
                     b.Navigation("Endereco");
                 });
 
+            modelBuilder.Entity("AndreAirlaines_API.Model.Passagem", b =>
+                {
+                    b.HasOne("AndreAirlaines_API.Model.Classe", "Classe")
+                        .WithMany()
+                        .HasForeignKey("ClasseId");
+
+                    b.HasOne("AndreAirlaines_API.Model.Passageiro", "Passageiro")
+                        .WithMany()
+                        .HasForeignKey("PassageiroCpf");
+
+                    b.HasOne("AndreAirlaines_API.Model.Voo", "Voo")
+                        .WithMany()
+                        .HasForeignKey("VooId");
+
+                    b.Navigation("Classe");
+
+                    b.Navigation("Passageiro");
+
+                    b.Navigation("Voo");
+                });
+
+            modelBuilder.Entity("AndreAirlaines_API.Model.PrecoBase", b =>
+                {
+                    b.HasOne("AndreAirlaines_API.Model.Aeroporto", "Destino")
+                        .WithMany()
+                        .HasForeignKey("DestinoSigla");
+
+                    b.HasOne("AndreAirlaines_API.Model.Aeroporto", "Origem")
+                        .WithMany()
+                        .HasForeignKey("OrigemSigla");
+
+                    b.Navigation("Destino");
+
+                    b.Navigation("Origem");
+                });
+
             modelBuilder.Entity("AndreAirlaines_API.Model.Voo", b =>
                 {
                     b.HasOne("AndreAirlaines_API.Model.Aeronave", "Aeronave")
@@ -204,17 +316,11 @@ namespace AndreAirlaines_API.Migrations
                         .WithMany()
                         .HasForeignKey("OrigemSigla");
 
-                    b.HasOne("AndreAirlaines_API.Model.Passageiro", "Passageiro")
-                        .WithMany()
-                        .HasForeignKey("PassageiroCpf");
-
                     b.Navigation("Aeronave");
 
                     b.Navigation("Destino");
 
                     b.Navigation("Origem");
-
-                    b.Navigation("Passageiro");
                 });
 #pragma warning restore 612, 618
         }

@@ -25,14 +25,14 @@ namespace AndreAirlaines_API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Aeroporto>>> GetAeroporto()
         {
-            return await _context.Aeroporto.Include(e => e.Endereco).ToListAsync();
+            return await _context.Aeroporto.Include(endereco => endereco.Endereco).ToListAsync();
         }
 
         // GET: api/Aeroportos/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Aeroporto>> GetAeroporto(string id)
         {
-            var aeroporto = await _context.Aeroporto.Include(e => e.Endereco)
+            var aeroporto = await _context.Aeroporto.Include(endereco => endereco.Endereco)
                                                     .Where(d => d.Sigla == id)
                                                     .SingleOrDefaultAsync();
 
@@ -81,36 +81,25 @@ namespace AndreAirlaines_API.Controllers
 
         public async Task<ActionResult<Aeroporto>> PostAeroporto(Aeroporto aeroporto)
         {
-            
-
-
-
-            //*********************
-
-
-
             var endereco = await _context.Endereco.Where(x => x.Id == aeroporto.Endereco.Id).FirstOrDefaultAsync();
-            var enderecoSite = await BuscaCep.BuscaCep.ViaCep(aeroporto.Endereco.Cep);
 
 
             if (endereco != null)
             {
                 aeroporto.Endereco = endereco;
             }
-            else if (enderecoSite != null)
+            else
             {
-                aeroporto.Endereco.Logradouro = enderecoSite.Logradouro;
-                aeroporto.Endereco.Localidade = enderecoSite.Localidade;
-                aeroporto.Endereco.Uf = enderecoSite.Uf;
-                aeroporto.Endereco.Bairro = enderecoSite.Bairro;
+                var enderecoSite = await BuscaCep.BuscaCep.ViaCep(aeroporto.Endereco.Cep);
 
+                if (enderecoSite != null)
+                {
+                    aeroporto.Endereco.Logradouro = enderecoSite.Logradouro;
+                    aeroporto.Endereco.Localidade = enderecoSite.Localidade;
+                    aeroporto.Endereco.Uf = enderecoSite.Uf;
+                    aeroporto.Endereco.Bairro = enderecoSite.Bairro;
+                }
             }
-
-
-
-
-
-            //**********************
 
             _context.Aeroporto.Add(aeroporto);
             try

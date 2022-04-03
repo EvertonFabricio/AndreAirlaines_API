@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace AndreAirlaines_API.Migrations
 {
-    public partial class tentativa_405 : Migration
+    public partial class initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -18,6 +18,19 @@ namespace AndreAirlaines_API.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Aeronave", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Classe",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Descricao = table.Column<string>(type: "varchar(50)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Classe", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -81,6 +94,34 @@ namespace AndreAirlaines_API.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PrecoBase",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    OrigemSigla = table.Column<string>(type: "varchar(5)", nullable: true),
+                    DestinoSigla = table.Column<string>(type: "varchar(5)", nullable: true),
+                    Valor = table.Column<double>(type: "float", nullable: false),
+                    DataInclusao = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PrecoBase", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PrecoBase_Aeroporto_DestinoSigla",
+                        column: x => x.DestinoSigla,
+                        principalTable: "Aeroporto",
+                        principalColumn: "Sigla",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_PrecoBase_Aeroporto_OrigemSigla",
+                        column: x => x.OrigemSigla,
+                        principalTable: "Aeroporto",
+                        principalColumn: "Sigla",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Voo",
                 columns: table => new
                 {
@@ -90,8 +131,7 @@ namespace AndreAirlaines_API.Migrations
                     OrigemSigla = table.Column<string>(type: "varchar(5)", nullable: true),
                     AeronaveId = table.Column<string>(type: "varchar(10)", nullable: true),
                     HoraEmbarque = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    HoraDesembarque = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    PassageiroCpf = table.Column<string>(type: "varchar(14)", nullable: true)
+                    HoraDesembarque = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -114,11 +154,41 @@ namespace AndreAirlaines_API.Migrations
                         principalTable: "Aeroporto",
                         principalColumn: "Sigla",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Passagem",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    VooId = table.Column<int>(type: "int", nullable: true),
+                    PassageiroCpf = table.Column<string>(type: "varchar(14)", nullable: true),
+                    ClasseId = table.Column<int>(type: "int", nullable: true),
+                    Desconto = table.Column<double>(type: "float", nullable: false),
+                    Valor = table.Column<double>(type: "float", nullable: false),
+                    DataCompra = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Passagem", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Voo_Passageiro_PassageiroCpf",
+                        name: "FK_Passagem_Classe_ClasseId",
+                        column: x => x.ClasseId,
+                        principalTable: "Classe",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Passagem_Passageiro_PassageiroCpf",
                         column: x => x.PassageiroCpf,
                         principalTable: "Passageiro",
                         principalColumn: "Cpf",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Passagem_Voo_VooId",
+                        column: x => x.VooId,
+                        principalTable: "Voo",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -131,6 +201,31 @@ namespace AndreAirlaines_API.Migrations
                 name: "IX_Passageiro_EnderecoId",
                 table: "Passageiro",
                 column: "EnderecoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Passagem_ClasseId",
+                table: "Passagem",
+                column: "ClasseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Passagem_PassageiroCpf",
+                table: "Passagem",
+                column: "PassageiroCpf");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Passagem_VooId",
+                table: "Passagem",
+                column: "VooId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PrecoBase_DestinoSigla",
+                table: "PrecoBase",
+                column: "DestinoSigla");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PrecoBase_OrigemSigla",
+                table: "PrecoBase",
+                column: "OrigemSigla");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Voo_AeronaveId",
@@ -146,15 +241,22 @@ namespace AndreAirlaines_API.Migrations
                 name: "IX_Voo_OrigemSigla",
                 table: "Voo",
                 column: "OrigemSigla");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Voo_PassageiroCpf",
-                table: "Voo",
-                column: "PassageiroCpf");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Passagem");
+
+            migrationBuilder.DropTable(
+                name: "PrecoBase");
+
+            migrationBuilder.DropTable(
+                name: "Classe");
+
+            migrationBuilder.DropTable(
+                name: "Passageiro");
+
             migrationBuilder.DropTable(
                 name: "Voo");
 
@@ -163,9 +265,6 @@ namespace AndreAirlaines_API.Migrations
 
             migrationBuilder.DropTable(
                 name: "Aeroporto");
-
-            migrationBuilder.DropTable(
-                name: "Passageiro");
 
             migrationBuilder.DropTable(
                 name: "Endereco");

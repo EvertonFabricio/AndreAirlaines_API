@@ -25,24 +25,25 @@ namespace AndreAirlaines_API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Passageiro>>> GetPassageiro()
         {
-           return await _context.Passageiro.Include(e => e.Endereco).ToListAsync();
+           return await _context.Passageiro.Include(endereco => endereco.Endereco).ToListAsync();
 
             //return await _context.Passageiro.ToListAsync(); // essa era a linha original
-                                                             //aqui muda tbm, coloca .Include(e => e.endereco) mantem o to list async
+                                                             //aqui muda tbm, coloca .Include com o lambda e mantem o to list async
         }
 
         // GET: api/Passageiros/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Passageiro>> GetPassageiro(string id)
         {
-           var passageiro = await _context.Passageiro.Include(e => e.Endereco)
+           var passageiro = await _context.Passageiro.Include(endereco => endereco.Endereco)
                                                      .Where(d => d.Cpf == id)
                                                      .SingleOrDefaultAsync();
             
-            //var passageiro = await _context.Passageiro.FindAsync(id);   //Linha original. É aqui que inclui a chamada do endereço.
+            //Linha original. É aqui que inclui o endereço por referencia de chave..
+            //var passageiro = await _context.Passageiro.FindAsync(id);
+           
             //no lugar do find async faz um lambda com .include
             //fica assim:
-            //.Include(e => e.endereco).ToListAsync.Where(d =>d.Id = id).SingleOrDefaultAsync();
 
 
             if (passageiro == null)
@@ -91,22 +92,28 @@ namespace AndreAirlaines_API.Controllers
         {
             //****aqui é onde eu puxo o endereco que ja existe pra colocar no cliente que eu cadastrei.
            
-            var endereco = await _context.Endereco.Where(x => x.Id == passageiro.Endereco.Id).FirstOrDefaultAsync();
+            
+            var enderecoExistente = await _context.Endereco.Where(x => x.Id == passageiro.Endereco.Id)
+                                                           .SingleOrDefaultAsync();
+
+
+            if (enderecoExistente != null)
+            {
+            passageiro.Endereco = enderecoExistente;
+            }
+            else
+            {
             var enderecoSite = await BuscaCep.BuscaCep.ViaCep(passageiro.Endereco.Cep);
 
+                if (enderecoSite != null)
+                {
+                    passageiro.Endereco.Logradouro = enderecoSite.Logradouro;
+                    passageiro.Endereco.Localidade = enderecoSite.Localidade;
+                    passageiro.Endereco.Uf = enderecoSite.Uf;
+                    passageiro.Endereco.Bairro = enderecoSite.Bairro;
+                }
+            }
 
-            if (endereco != null)
-            {
-            passageiro.Endereco = endereco;
-            }
-            else if (enderecoSite != null)
-            {
-                passageiro.Endereco.Logradouro = enderecoSite.Logradouro;
-                passageiro.Endereco.Localidade = enderecoSite.Localidade;
-                passageiro.Endereco.Uf = enderecoSite.Uf;
-                passageiro.Endereco.Bairro = enderecoSite.Bairro;
-            
-            }
              // daqui pra baixo ja tava feito.
             _context.Passageiro.Add(passageiro);
             try
