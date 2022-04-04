@@ -16,7 +16,7 @@ namespace AndreAirlaines_API.Model
         public Aeroporto Destino { get; set; }
 
         [Required]
-        public double Valor { get; set; }
+        public double Preco { get; set; }
 
         [DataType(DataType.Date), DisplayFormat(DataFormatString = "{yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime DataInclusao { get; set; } = DateTime.Now;

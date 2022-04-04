@@ -93,7 +93,7 @@ namespace AndreAirlaines_API.Controllers
             //****aqui é onde eu puxo o endereco que ja existe pra colocar no cliente que eu cadastrei.
            
             
-            var enderecoExistente = await _context.Endereco.Where(x => x.Id == passageiro.Endereco.Id)
+            var enderecoExistente = await _context.Endereco.Where(endereco => endereco.Id == passageiro.Endereco.Id)
                                                            .SingleOrDefaultAsync();
 
 
