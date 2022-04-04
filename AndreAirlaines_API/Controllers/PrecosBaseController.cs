@@ -25,8 +25,10 @@ namespace AndreAirlaines_API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PrecoBase>>> GetPrecoBase()
         {
-            return await _context.PrecoBase.Include(origem => origem.Origem)
-                                           .Include(destino => destino.Destino)
+            return await _context.PrecoBase.Include(aeroporto => aeroporto.Origem)
+                                           .Include(aeroporto => aeroporto.Origem.Endereco)
+                                           .Include(aeroporto => aeroporto.Destino)
+                                           .Include(aeroporto => aeroporto.Destino.Endereco)
                                            .ToListAsync();
         }
 
@@ -34,12 +36,12 @@ namespace AndreAirlaines_API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<PrecoBase>> GetPrecoBase(int id)
         {
-            var precoBase = await _context.PrecoBase.Include(origem => origem.Origem)
-                                                    .Include(destino => destino.Destino)
-                                                    .Where(a => a.Id == id)
+            var precoBase = await _context.PrecoBase.Include(aeroporto => aeroporto.Origem)
+                                                    .Include(aeroporto => aeroporto.Origem.Endereco)
+                                                    .Include(aeroporto => aeroporto.Destino)
+                                                    .Include(aeroporto => aeroporto.Destino.Endereco)
+                                                    .Where(busca => busca.Id == id)
                                                     .SingleOrDefaultAsync();
-
-
             if (precoBase == null)
             {
                 return NotFound();
@@ -84,14 +86,12 @@ namespace AndreAirlaines_API.Controllers
         [HttpPost]
         public async Task<ActionResult<PrecoBase>> PostPrecoBase(PrecoBase precoBase)
         {
-            var origem = await _context.Aeroporto.Where(x => x.Sigla == precoBase.Origem.Sigla).SingleOrDefaultAsync();
-            var destino = await _context.Aeroporto.Where(x => x.Sigla == precoBase.Destino.Sigla).SingleOrDefaultAsync();
 
-            if (origem != null && destino != null)
-            {
-                precoBase.Origem = origem;
-                precoBase.Destino = destino;
-            }
+            var destino = await _context.Aeroporto.Where(aeroporto => aeroporto.Sigla == precoBase.Destino.Sigla).SingleOrDefaultAsync();
+            var origem = await _context.Aeroporto.Where(aeroporto => aeroporto.Sigla == precoBase.Origem.Sigla).SingleOrDefaultAsync();
+
+            precoBase.Destino = destino;
+            precoBase.Origem = origem;
 
             _context.PrecoBase.Add(precoBase);
             await _context.SaveChangesAsync();

@@ -7,7 +7,9 @@ namespace AndreAirlaines_API.Model
     {
         [Key, Column("Sigla", TypeName = "varchar(5)")]
         public string Sigla { get; set; }
-        [Required, Column("Nome", TypeName ="Varchar(20)")]
+
+
+        [Column("Nome", TypeName ="Varchar(20)")]
         public string Nome { get; set; }
 
         public Endereco Endereco { get; set; }

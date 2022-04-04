@@ -8,9 +8,9 @@ namespace AndreAirlaines_API.Model
         [Key, Column("Id", TypeName = "varchar(10)")]
         public string Id { get; set; }
 
-        [Required, Column("Nome", TypeName = "varchar(50)")]
+        [Column("Nome", TypeName = "varchar(50)")]
         public string Nome { get; set; }
-        [Required]
+       
         public int Capacidade { get; set; }
 
     }

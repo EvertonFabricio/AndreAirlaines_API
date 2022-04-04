@@ -32,7 +32,7 @@ namespace AndreAirlaines_API.Controllers
         }
 
         // GET: api/Passageiros/5
-        [HttpGet("{id}")]
+        [HttpGet("{CPF}")]
         public async Task<ActionResult<Passageiro>> GetPassageiro(string id)
         {
            var passageiro = await _context.Passageiro.Include(endereco => endereco.Endereco)

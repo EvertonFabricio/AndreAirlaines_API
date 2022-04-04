@@ -80,6 +80,16 @@ namespace AndreAirlaines_API.Controllers
 
         public async Task<ActionResult<Endereco>> PostEndereco(Endereco endereco)
         {
+            var enderecoSite = await BuscaCep.BuscaCep.ViaCep(endereco.Cep);
+
+            if (enderecoSite != null)
+            {
+                endereco.Logradouro = enderecoSite.Logradouro;
+                endereco.Bairro = enderecoSite.Bairro;
+                endereco.Localidade = enderecoSite.Localidade;
+                endereco.Uf = enderecoSite.Uf;
+            }
+
             _context.Endereco.Add(endereco);
             await _context.SaveChangesAsync();
 

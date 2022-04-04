@@ -18,7 +18,9 @@ namespace AndreAirlaines_API.Model
 
         public double Desconto { get; set; }
         public double Valor { get; set; }
-        public DateTime DataCompra { get; set; } = DateTime.Now;
+
+        [DataType(DataType.Date), DisplayFormat(DataFormatString = "{yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+        public DateTime DataCompra { get; set; }
 
     }
 }

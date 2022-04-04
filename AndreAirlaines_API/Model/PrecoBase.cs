@@ -18,6 +18,7 @@ namespace AndreAirlaines_API.Model
         [Required]
         public double Valor { get; set; }
 
+        [DataType(DataType.Date), DisplayFormat(DataFormatString = "{yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime DataInclusao { get; set; } = DateTime.Now;
 
     }
